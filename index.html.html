@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auranova - Micro-Terapia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .chat-scroll { scroll-behavior: smooth; }
+        .typing-dot { animation: blink 1.5s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+        
+        /* Personalización de colores AuraNova */
+        .bg-auranova { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
+        .text-auranova { color: #8b5cf6; }
+        .border-auranova { border-color: #a855f7; }
+    </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-[375px] h-[720px] bg-white rounded-[3rem] border-[10px] border-slate-900 shadow-2xl relative overflow-hidden flex flex-col font-sans">
+        
+        <div class="bg-slate-900 h-6 w-full flex justify-center sticky top-0 z-50">
+            <div class="w-28 h-4 bg-black rounded-b-xl"></div>
+        </div>
+
+        <div id="app-content" class="flex-1 overflow-y-auto bg-slate-50 flex flex-col">
+            </div>
+
+        <div class="bg-white border-t border-slate-100 flex justify-around items-center py-4 px-2">
+            <button onclick="viewHome()" id="nav-home" class="flex flex-col items-center text-auranova transition-all">
+                <i data-lucide="home" size="22"></i>
+                <span class="text-[10px] font-extrabold mt-1">Inicio</span>
+            </button>
+            <button onclick="viewChat()" id="nav-chat" class="flex flex-col items-center text-slate-400 transition-all">
+                <i data-lucide="message-circle" size="22"></i>
+                <span class="text-[10px] font-extrabold mt-1">Chat</span>
+            </button>
+            <button onclick="viewTools()" id="nav-tools" class="flex flex-col items-center text-slate-400 transition-all">
+                <i data-lucide="sparkles" size="22"></i>
+                <span class="text-[10px] font-extrabold mt-1">AuraCare</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Datos simulados
+        let messages = [
+            { role: 'psych', text: 'Bienvenido a Auranova. Soy tu profesional asignado. ¿En qué puedo apoyarte hoy?', time: '9:00 AM' }
+        ];
+
+        const content = document.getElementById('app-content');
+
+        // --- VISTA: INICIO ---
+        function viewHome() {
+            setActiveNav('nav-home');
+            content.innerHTML = `
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Auranova</h1>
+                            <p class="text-slate-400 text-sm font-medium">Tu espacio seguro, hoy.</p>
+                        </div>
+                        <div class="w-11 h-11 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm">
+                            <i data-lucide="user"></i>
+                        </div>
+                    </div>
+
+                    <div onclick="viewChat()" class="bg-auranova p-6 rounded-[2rem] shadow-xl text-white mb-8 cursor-pointer transform active:scale-95 transition-all">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="bg-white/20 p-1 rounded-md">
+                                <i data-lucide="clock" size="14"></i>
+                            </div>
+                            <span class="text-[10px] font-bold tracking-widest uppercase">Respuesta en camino</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Micro-sesión activa</h3>
+                        <p class="text-sm text-indigo-100 leading-relaxed mb-4">"Me siento agotado por el semestre..."</p>
+                        <div class="bg-white/10 p-3 rounded-xl border border-white/10 flex justify-between items-center">
+                            <span class="text-[10px] font-bold">PROFESIONAL ASIGNADO</span>
+                            <span class="text-[10px] bg-white text-auranova px-2 py-0.5 rounded-full font-bold">Dra. Ana</span>
+                        </div>
+                    </div>
+
+                    <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="layout-grid" size="18" class="text-auranova"></i> Explorar Auranova
+                    </h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div onclick="viewTools()" class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center gap-3 cursor-pointer">
+                            <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500"><i data-lucide="wind"></i></div>
+                            <span class="text-xs font-bold text-slate-700">Respirar</span>
+                        </div>
+                        <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center gap-3">
+                            <div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center text-orange-500"><i data-lucide="zap"></i></div>
+                            <span class="text-xs font-bold text-slate-700">Pautas</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // --- VISTA: CHAT ---
+        function viewChat() {
+            setActiveNav('nav-chat');
+            renderChatUI();
+        }
+
+        function renderChatUI() {
+            content.innerHTML = `
+                <div class="flex flex-col h-full bg-slate-50">
+                    <div class="bg-white p-5 border-b flex items-center gap-3 shadow-sm z-10">
+                        <div class="w-10 h-10 rounded-full bg-auranova flex items-center justify-center text-white font-bold shadow-md">AN</div>
+                        <div>
+                            <h3 class="font-bold text-sm text-slate-800">Auranova Profesional</h3>
+                            <p class="text-[10px] text-green-500 font-bold uppercase tracking-tighter">● Online</p>
+                        </div>
+                    </div>
+                    
+                    <div id="chat-box" class="flex-1 p-4 overflow-y-auto space-y-4">
+                        ${messages.map(m => `
+                            <div class="flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in duration-300">
+                                <div class="${m.role === 'user' ? 'bg-auranova text-white shadow-lg shadow-indigo-100' : 'bg-white text-slate-700 border border-slate-100'} p-4 rounded-2xl max-w-[85%] text-sm font-medium">
+                                    ${m.text}
+                                    <div class="text-[9px] mt-2 opacity-50 text-right">${m.time}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                        <div id="typing" class="hidden flex justify-start">
+                            <div class="bg-white border border-slate-100 p-3 rounded-2xl text-[10px] text-slate-400 font-bold">
+                                AURANOVA está analizando tu mensaje<span class="typing-dot">.</span><span class="typing-dot">.</span><span class="typing-dot">.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-white border-t border-slate-100 flex items-center gap-3">
+                        <button class="text-slate-400 hover:text-auranova"><i data-lucide="mic" size="20"></i></button>
+                        <input type="text" id="msg-input" placeholder="Escribe tu mensaje..." 
+                            class="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-purple-400 outline-none transition-all">
+                        <button onclick="sendMessage()" class="bg-auranova text-white p-3 rounded-2xl hover:opacity-90 transition-all shadow-lg shadow-purple-200">
+                            <i data-lucide="send" size="18"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+            scrollChat();
+
+            document.getElementById('msg-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('msg-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            messages.push({ role: 'user', text: text, time: 'Ahora' });
+            input.value = '';
+            renderChatUI();
+
+            document.getElementById('typing').classList.remove('hidden');
+            scrollChat();
+
+            setTimeout(() => {
+                messages.push({ 
+                    role: 'psych', 
+                    text: 'He recibido tu mensaje en Auranova. Lo analizaré cuidadosamente y te daré una respuesta profesional en las próximas horas. Recuerda que no estás solo/a.', 
+                    time: 'Recién' 
+                });
+                renderChatUI();
+            }, 3500);
+        }
+
+        function scrollChat() {
+            const box = document.getElementById('chat-box');
+            if(box) box.scrollTop = box.scrollHeight;
+        }
+
+        // --- VISTA: BIENESTAR ---
+        function viewTools() {
+            setActiveNav('nav-tools');
+            content.innerHTML = `
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-6 tracking-tight">AuraCare</h2>
+                    <p class="text-sm text-slate-500 mb-8 font-medium italic">Herramientas inmediatas mientras llega tu respuesta.</p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-4 hover:border-auranova transition-colors cursor-pointer">
+                            <div class="bg-indigo-50 p-4 rounded-2xl text-indigo-600"><i data-lucide="wind"></i></div>
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800">Respiración Aura</h4>
+                                <p class="text-[11px] text-slate-400 font-medium">Calma tu sistema nervioso en 2 min.</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-4 hover:border-auranova transition-colors cursor-pointer">
+                            <div class="bg-purple-50 p-4 rounded-2xl text-purple-600"><i data-lucide="brain-circuit"></i></div>
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800">Foco Universitario</h4>
+                                <p class="text-[11px] text-slate-400 font-medium">Pautas para estudiar con ansiedad.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10 p-6 bg-red-50 rounded-[2.5rem] border border-red-100">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="alert-circle" class="text-red-600" size="18"></i>
+                            <h4 class="text-red-700 font-extrabold text-sm uppercase">S.O.S Inmediato</h4>
+                        </div>
+                        <p class="text-[11px] text-red-600 mb-4 font-medium leading-relaxed">Si sientes que tu vida o bienestar están en riesgo inminente, presiona el botón para llamada directa.</p>
+                        <button class="w-full bg-red-600 text-white py-4 rounded-2xl text-xs font-black shadow-lg shadow-red-200 uppercase tracking-widest active:scale-95 transition-all">Llamar a Emergencias</button>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // --- UTILIDADES ---
+        function setActiveNav(id) {
+            const navs = ['nav-home', 'nav-chat', 'nav-tools'];
+            navs.forEach(n => {
+                const el = document.getElementById(n);
+                if(n === id) {
+                    el.classList.replace('text-slate-400', 'text-auranova');
+                    el.classList.add('scale-110');
+                } else {
+                    el.classList.replace('text-auranova', 'text-slate-400');
+                    el.classList.remove('scale-110');
+                }
+            });
+        }
+
+        viewHome();
+    </script>
+</body>
+</html>
